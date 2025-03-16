@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 namespace BarWin
 {
     public partial class BarWinMain : Form
@@ -25,7 +24,6 @@ namespace BarWin
             kryptonNumericUpDown1.Controls[0].Controls[0].Hide();
             kryptonNumericUpDown1.Controls[0].Controls[1].Width += 16;
             kryptonNumericUpDown1.NumericUpDown.Controls[1].Width -= 4;
-            kryptonNumericUpDown1.StateCommon.
         }
 
         private void kryptonButton1_Click(object sender, EventArgs e)
