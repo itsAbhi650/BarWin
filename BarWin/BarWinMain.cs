@@ -12,6 +12,9 @@ namespace BarWin
     public partial class BarWinMain : Form
     {
         ZXing.BarcodeWriter barcodeWriter;
+        private bool dragging = false;
+        private Point dragCursorPoint;
+        private Point dragFormPoint;
         public BarWinMain()
         {
             InitializeComponent();
@@ -21,9 +24,30 @@ namespace BarWin
                 Options = new ZXing.Common.EncodingOptions() { Height = Convert.ToInt32(kryptonPictureBox1.Height), Width = Convert.ToInt32(kryptonPictureBox1.Width), Margin = Convert.ToInt32(1) },
                 Renderer = new ZXing.Rendering.BitmapRenderer() { Background = Color.White, Foreground = Color.Black }
             };
-            kryptonNumericUpDown1.Controls[0].Controls[0].Hide();
-            kryptonNumericUpDown1.Controls[0].Controls[1].Width += 16;
-            kryptonNumericUpDown1.NumericUpDown.Controls[1].Width -= 4;
+            pnlBWHeader.MouseMove += PnlBWHeader_MouseMove;
+            pnlBWHeader.MouseUp += PnlBWHeader_MouseUp;
+            pnlBWHeader.MouseDown += PnlBWHeader_MouseDown;
+        }
+
+        private void PnlBWHeader_MouseDown(object sender, MouseEventArgs e)
+        {
+            dragging = true;
+            dragCursorPoint = Cursor.Position;
+            dragFormPoint = this.Location;
+        }
+
+        private void PnlBWHeader_MouseUp(object sender, MouseEventArgs e)
+        {
+            dragging = false;
+        }
+
+        private void PnlBWHeader_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (dragging)
+            {
+                Point diff = Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
+                this.Location = Point.Add(dragFormPoint, new Size(diff));
+            }
         }
 
         private void kryptonButton1_Click(object sender, EventArgs e)
@@ -51,11 +75,6 @@ namespace BarWin
             navBar.SelectedPage = pageMatrix;
         }
 
-        private void tbMtxText_TextChanged(object sender, EventArgs e)
-        {
-            GenerateCode(tbMtxText.Text);
-        }
-
         private void GenerateCode(string Text)
         {
             try
@@ -75,6 +94,11 @@ namespace BarWin
         {
             btnShowHidePass.Text = btnShowHidePass.Text == "Hide" ? "Show" : "Hide";
             tbPass.UseSystemPasswordChar = !tbPass.UseSystemPasswordChar;
+        }
+
+        private void tbMtxText_TextChanged(object sender, EventArgs e)
+        {
+            GenerateCode(tbMtxText.Text);
         }
 
         private void tbWiFi_TextChanged(object sender, EventArgs e)
@@ -116,6 +140,31 @@ namespace BarWin
         {
             GenerateCode(QRCodeContentFormatter.GenerateSMS(tbNum.Text, tbMsg.Text));
             
+        }
+
+        private void tbCal_TextChanged(object sender, EventArgs e)
+        {
+            GenerateCode(QRCodeContentFormatter.GenerateCalendarEvent(tbEventName.Text, tbEventStart.Value, tbEventEnd.Value, tbEventLoc.Text, tbEventDesc.Text));
+        }
+
+        private void tbWA_TextChanged(object sender, EventArgs e)
+        {
+            GenerateCode(QRCodeContentFormatter.GenerateWhatsApp(tbWAPhone.Text, tbWAMsg.Text));
+        }
+
+        private void tbURL_TextChanged(object sender, EventArgs e)
+        {
+            GenerateCode(QRCodeContentFormatter.GenerateURL(tbURL.Text));
+        }
+
+        private void tbGeo_ValueChanged(object sender, EventArgs e)
+        {
+            GenerateCode(QRCodeContentFormatter.GenerateGeoLocation(Convert.ToDouble(nudLat.Value), Convert.ToDouble(nudLong.Value), Convert.ToInt32(nudZoom.Value)));
+        }
+
+        private void tbCalV_ValueChanged(object sender, EventArgs e)
+        {
+            GenerateCode(QRCodeContentFormatter.GenerateCalendarEvent(tbEventName.Text, tbEventStart.Value, tbEventEnd.Value, tbEventLoc.Text, tbEventDesc.Text));
         }
     }
 }
